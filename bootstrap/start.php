@@ -24,11 +24,16 @@ $app = new Illuminate\Foundation\Application;
 |
 */
 
-$env = $app->detectEnvironment(array(
+// $env = $app->detectEnvironment(array(
 
-	'local' => array('homestead'),
+// 	'local' => array('homestead'),
 
-));
+// ));
+
+$env = $app->detectEnvironment(function()
+{
+ return !empty($_SERVER['LARAVEL_ENV']) && $_SERVER['LARAVEL_ENV'] == 'local' ? 'local' : 'production';
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -69,5 +74,13 @@ require $framework.'/Illuminate/Foundation/start.php';
 | from the actual running of the application and sending responses.
 |
 */
+
+/*
+Detect an error
+*/
+App::missing(function($exception)
+{
+    return Response::view('errors.missing', array(), 404);
+});
 
 return $app;
