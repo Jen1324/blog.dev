@@ -1,1 +1,0 @@
- $post = Post::find(1);

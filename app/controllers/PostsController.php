@@ -2,6 +2,14 @@
 
 class PostsController extends \BaseController {
 
+	public function __construct()
+	{
+	    // call base controller constructor
+	    parent::__construct();
+
+	    // run auth filter before all methods on this controller except index and show
+	    $this->beforeFilter('auth.basic', array('except' => array('index', 'show')));
+	}
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -9,12 +17,30 @@ class PostsController extends \BaseController {
 	 */
 	public function index()
 	{
-		// $posts = Post::all()->$posts;
-		// return View::make('posts.create');
-		return View::make('posts.index')->with('posts', Post::all());
-		// return ("This shows the post.");
-	}
+		$posts = Post::with('user')->paginate(4);
+		
+		if(Input::has('search'))
+		{
+			$search = Input::get('search', '');
+			$posts = Post::with('user')->orderBy('created_at', 'desc')->where("title", "LIKE", "%$search%")->paginate(4);
+		}
+		else
+		{
+			// do regular code here
+			$posts = Post::paginate(4);
+		}
 
+		return View::make('posts.index')->with('posts', $posts);
+
+		// $posts = Post::paginate(4);
+
+		// return Post::find(1)->user;
+		// $user = Post::find(1)->user;
+		// return $user->email;
+
+		// Eager Loading: $posts = Post::all();
+		// $posts = Post::with('user')->get();
+	}
 
 	/**
 	 * Show the form for creating a new resource.
@@ -23,7 +49,7 @@ class PostsController extends \BaseController {
 	 */
 	public function create()
 	{
-		return View::make('posts.create');
+		return View::make('posts.create-edit');
 		//return ("This is the create function.");
 	}
 
@@ -35,21 +61,7 @@ class PostsController extends \BaseController {
 	 */
 	public function store()
 	{
-
-		$validator = Validator::make(Input::all(), Post::$rules);
-
-		if ($validator->fails())
-		{
-			return Redirect::back()->withInput()->withErrors($validator);
-		}
-		else
-		{
-			$post = new Post();
-			$post->title = Input::get('title');
-			$post->title = Input::get('body');
-			$post->save();
-			return Redirect::action('PostsController@index');
-		}
+		return $this->update(null);
 	}
 
 
@@ -61,8 +73,8 @@ class PostsController extends \BaseController {
 	 */
 	public function show($id)
 	{
-		$posts = Post::index($id);
-		return View::make('posts.show')->with('posts', $post);
+		$post = Post::find($id);
+		return View::make('posts.show')->with('post', $post);
 		// return ("This is showing the post.");
 	}
 
@@ -75,7 +87,9 @@ class PostsController extends \BaseController {
 	 */
 	public function edit($id)
 	{
-		return ("This is the edit function.");
+		$post = Post::find($id);
+		return View::make('posts.edit')->with('post', $post);
+
 	}
 
 
@@ -87,8 +101,29 @@ class PostsController extends \BaseController {
 	 */
 	public function update($id)
 	{
-		return ("This is the update funtcion.");
+		$post = new Post();
+
+		if ($id != null)
+		{
+			$post = Post::findOrFail($id);
+		}
+
+		$validator = Validator::make(Input::all(), Post::$rules);
+
+		if ($validator->fails())
+		{
+			return Redirect::back()->withInput()->withErrors($validator);
+		}
+		else
+		{
+			$post->title = Input::get('title');
+			$post->body = Input::get('body');
+			$post->save();
+			
+			return Redirect::action('PostsController@show', $post->id);
+		}
 	}
+
 
 
 	/**
