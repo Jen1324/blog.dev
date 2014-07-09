@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Business Casual Template for Bootstrap</title>
+    <title>Jennifer Bochniak</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.css" rel="stylesheet">
@@ -17,9 +17,19 @@
 </head>
 
 <body>
+    <div class="container">
+        @if (Auth::check())
+            {{ Auth::user()->email }}
+            {{ link_to_action('PostsController@create', 'Create Post') }}
+            {{ link_to_action('HomeController@logout', 'Log Out') }}
+        @else
+            {{ link_to_action('HomeController@showLogin', 'Login') }}
+        @endif
+    </div>
 
-    <div class="brand">Business Casual</div>
-    <div class="address-bar">The Plaza | 5483 Start Bootstrap Ave. | Beverly Hills, California 26892 | 555.519.2013</div>
+
+    <div class="brand">Jennifer Bochniak</div>
+    <div class="address-bar">Web Developer | HTML, CSS, PHP, Laravel, Javascript, JQuery, MySQL | San Antonio, Texas</div>
 
     <nav class="navbar navbar-default" role="navigation">
         <div class="container">
@@ -41,6 +51,10 @@
                     <li><a href="{{{ action('HomeController@about')}}}">About</a> 
                     </li>
                     <li><a href="{{{ action('HomeController@blog')}}}">Blog</a> 
+                    </li>
+                    <li><a href="{{{ action('HomeController@portfolio')}}}">Portfolio</a> 
+                    </li>
+                    <li><a href="{{{ action('HomeController@resume')}}}">Resume</a> 
                     </li>
                     <li><a href="{{{ action('HomeController@contact')}}}">Contact</a> 
                     </li>
@@ -116,6 +130,9 @@
         {{ Form::close() }}
 
 
+<!-- Form::label('image','Image Uplaod', array('class' =>)) FORM FOR IMAGE -->
+
+
         @yield('content2')
 
     </div>
@@ -139,7 +156,7 @@
     // Activates the Carousel
     $('.carousel').carousel({
         interval: 5000
-    })
+    });
     </script>
 
 </body>

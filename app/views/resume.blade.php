@@ -2,7 +2,7 @@
 
 @section('content')
 
-	<h2 class="intro-text text-center">Build a website <strong>worth visiting</strong>
+	<h2 class="intro-text text-center"><strong>Resume</strong>
 	</h2>
 	<hr>
 	<img class="img-responsive img-border img-left" src="img/intro-pic.jpg" alt="">

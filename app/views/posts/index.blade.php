@@ -23,6 +23,3 @@
 {{ $posts->links() }}
 @stop
 
-$posts = DB::table('posts')
-	->orderBy('created_at', 'desc'),
-	->get();

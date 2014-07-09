@@ -1,3 +1,11 @@
+<html>
+<head>
+	 <link rel="stylesheet" type="text/css" href="/pagedown.html"/>
+</head>
+<body>
+</body>
+
+
 <?php
 
 class PostsController extends \BaseController {
@@ -8,7 +16,7 @@ class PostsController extends \BaseController {
 	    parent::__construct();
 
 	    // run auth filter before all methods on this controller except index and show
-	    $this->beforeFilter('auth.basic', array('except' => array('index', 'show')));
+	    $this->beforeFilter('auth', array('except' => array('index', 'show')));
 	}
 	/**
 	 * Display a listing of the resource.
@@ -71,12 +79,14 @@ class PostsController extends \BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
+
 	public function show($id)
 	{
-		$post = Post::find($id);
+		$post = Post::findOrFail($id);
+		$post->body = Parsedown::instance()->parse($post->body);
 		return View::make('posts.show')->with('post', $post);
-		// return ("This is showing the post.");
 	}
+	
 
 
 	/**
@@ -102,6 +112,7 @@ class PostsController extends \BaseController {
 	public function update($id)
 	{
 		$post = new Post();
+		$post->user_id = Auth::user()->id;
 
 		if ($id != null)
 		{
@@ -119,6 +130,12 @@ class PostsController extends \BaseController {
 			$post->title = Input::get('title');
 			$post->body = Input::get('body');
 			$post->save();
+
+			if (Input::hasFile('image') && Input::file('image')->isValid()) 
+			{
+				$post->addUploadedImage(Input::file('image'));
+				$post->save();
+			}
 			
 			return Redirect::action('PostsController@show', $post->id);
 		}
@@ -136,6 +153,10 @@ class PostsController extends \BaseController {
 	{
 		return ("this is the delete function");
 	}
-
-
 }
+?>
+</html>
+
+
+
+
